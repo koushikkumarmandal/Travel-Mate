@@ -1,27 +1,104 @@
-<nav class="navbar navbar-expand-lg bg-body-light border-bottom sticky-top">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-solid fa-compass"></i></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+
+    <!-- Brand -->
+    <a class="navbar-brand d-flex align-items-center" href="/listings">
+      <i class="fa-solid fa-compass fa-lg text-primary me-2"></i>
+      <span class="fw-bold text-primary">Travel Mate</span>
+    </a>
+
+    <!-- Toggler -->
+    <button
+      class="navbar-toggler border-0"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link" href="/listings">Explore</a>
-      </div>
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
+        <!-- Dropdown Menu -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle fw-semibold"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Menu
+          </a>
 
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Add New Listing</a>
-        <% if (!currUser) { %>
-          <a class="nav-link" href="/signup"><b>Signup</b> </a>
-          <a class="nav-link" href="/login"><b>Login</b> </a>
-  
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/listings">Explore</a></li>
+            <li><a class="dropdown-item" href="/listings/new">Add New Listing</a></li>
 
-        <% } else { %>
-          <a class="nav-link" href="/logout"><b>Logout</b> </a>
-        <% } %>
-      </div>
+            <% if (!currUser) { %>
+              <li><a class="dropdown-item text-success" href="/signup">Signup</a></li>
+              <li><a class="dropdown-item text-primary" href="/login">Login</a></li>
+            <% } else { %>
+              <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+            <% } %>
+          </ul>
+        </li>
+
+      </ul>
     </div>
   </div>
 </nav>
+
+<!-- Spacer -->
+<div class="pt-5"></div>
+
+<!-- Styles -->
+<style>
+  body {
+    background-color: #f9f9f9;
+  }
+
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
+
+  .navbar-nav .nav-link {
+    transition: color 0.2s;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #0d6efd;
+  }
+
+  /* ===================================== */
+  /* SMALL SCREEN FINAL FIX (NO "MENU") */
+  /* ===================================== */
+  @media (max-width: 991px) {
+
+    /* Hide Menu text completely */
+    .nav-item.dropdown > a {
+      display: none;
+    }
+
+    /* Force dropdown items visible */
+    .dropdown-menu {
+      display: block !important;
+      position: static !important;
+      box-shadow: none;
+      border: none;
+      margin: 0;
+      padding-left: 1rem;
+    }
+
+    /* Vertical list styling */
+    .dropdown-item {
+      padding: 0.7rem 0;
+    }
+  }
+</style>
