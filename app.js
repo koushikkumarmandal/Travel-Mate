@@ -216,6 +216,11 @@ app.post(
 
 //INDEX ROUTE
 
+app.get("/",async (req,res)=>{
+    let allListings= await Listing.find();
+    res.render("listings/index.ejs",{allListings});
+});
+
 app.get("/listings",async (req,res)=>{
     let allListings= await Listing.find();
     res.render("listings/index.ejs",{allListings});
