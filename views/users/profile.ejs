@@ -1,0 +1,13 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">My Profile</h2>
+
+  <div class="card shadow p-4">
+    <p><strong>Username:</strong> <%= currUser.username %></p>
+    <p><strong>Email:</strong> <%= currUser.email %></p>
+    <p><strong>User ID:</strong> <%= currUser._id %></p>
+
+    <a href="/listings" class="btn btn-primary mt-3">Go Back</a>
+  </div>
+</div>
