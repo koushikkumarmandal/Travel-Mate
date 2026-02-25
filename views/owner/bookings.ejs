@@ -5,7 +5,7 @@
   
   <h2 class="fw-bold mb-3 text-center">My Property Bookings</h2>
 
-  <!-- ================= TABLE FOR DESKTOP & TABLET ================= -->
+
   <div class="table-responsive d-none d-md-block shadow rounded">
     <table class="table table-bordered table-striped align-middle text-center">
       <thead class="table-dark">
@@ -37,7 +37,7 @@
           <td><%= new Date(b.checkIn).toDateString() %></td>
           <td><%= new Date(b.checkOut).toDateString() %></td>
 
-          <!-- ✅ Adults & Children -->
+          
           <td><%= b.adults || 1 %></td>
           <td><%= b.children || 0 %></td>
 
@@ -57,7 +57,7 @@
     </table>
   </div>
 
-  <!-- ================= MOBILE CARD VIEW ================= -->
+
   <div class="d-block d-md-none">
     <% bookings.forEach(b => { %>
       <div class="card shadow mb-3">
@@ -75,7 +75,7 @@
           <p class="mb-1"><strong>Check In:</strong> <%= new Date(b.checkIn).toDateString() %></p>
           <p class="mb-1"><strong>Check Out:</strong> <%= new Date(b.checkOut).toDateString() %></p>
 
-          <!-- ✅ Adults & Children -->
+    
           <p class="mb-1"><strong>Adults:</strong> <%= b.adults || 1 %></p>
           <p class="mb-1"><strong>Children:</strong> <%= b.children || 0 %></p>
 
