@@ -346,10 +346,10 @@ app.delete("/listings/:id", isAdminOrOwner, async (req, res) => {
     return res.redirect(`/listings/${id}`);
   }
 
-  // 🔥 Delete all bookings of this listing
+  //  Delete all bookings of this listing
   await Booking.deleteMany({ listing: id });
 
-  // 🔥 Delete availability dates
+  //  Delete availability dates
   await Availability.deleteMany({ listing: id });
 
   await Listing.findByIdAndDelete(id);
@@ -480,7 +480,7 @@ app.post("/listings/:id/book", isUser, async (req, res) => {
     let days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
     if (days <= 0) days = 1;
 
-    // 💰 New Pricing Logic
+    
     let basePrice = listing.price;
 
     let adultPricePerDay = adults * basePrice;
@@ -505,7 +505,7 @@ app.post("/listings/:id/book", isUser, async (req, res) => {
 
     await booking.save();
 
-    req.flash("success", "✅ Booking successful!");
+    req.flash("success", " Booking successful!");
     res.redirect("/mybookings");
 
   } catch (err) {
@@ -609,7 +609,7 @@ app.post("/admin/bookings", isAdmin, async (req, res) => {
     let days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
     if (days <= 0) days = 1;
 
-    // 💰 Adult Full + Child Half Price
+    //  Adult Full + Child Half Price
     let basePrice = listing.price;
     let adultPricePerDay = adults * basePrice;
     let childPricePerDay = children * (basePrice / 2);
@@ -633,7 +633,7 @@ app.post("/admin/bookings", isAdmin, async (req, res) => {
 
     await booking.save();
 
-    req.flash("success", "✅ Admin Booking Created Successfully");
+    req.flash("success", "Admin Booking Created Successfully");
     res.redirect("/admin/bookings");
 
   } catch (err) {
@@ -675,19 +675,19 @@ app.delete("/bookings/:id", async (req, res) => {
     return res.redirect("back");
   }
 
-  // ✅ User can delete own booking
+  //  User can delete own booking
   if (req.user.role === "user" && !booking.user.equals(req.user._id)) {
     req.flash("error", "You don't have permission");
     return res.redirect("/mybookings");
   }
 
-  // ✅ Owner can delete booking of his property
+  //  Owner can delete booking of his property
   if (req.user.role === "owner" && !booking.owner.equals(req.user._id)) {
     req.flash("error", "You are not owner of this property");
     return res.redirect("/owner/bookings");
   }
 
-  // ✅ Admin can delete any booking
+  //  Admin can delete any booking
   await Booking.findByIdAndDelete(req.params.id);
 
   req.flash("success", "Booking Cancelled Successfully");
