@@ -43,7 +43,7 @@
               <li><a class="dropdown-item text-primary" href="/login">Login</a></li>
             <% } else { %>
 
-             //Admin
+            
               <% if (currUser.role === "admin") { %>
                 <li><a class="dropdown-item" href="/profile">My Profile</a></li>
                 <li><a class="dropdown-item" href="/admin/dashboard">Admin Dashboard</a></li>
@@ -52,14 +52,14 @@
                 <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
               <% } %>
 
-             //User
+             
               <% if (currUser.role === "user") { %>
                 <li><a class="dropdown-item" href="/profile">My Profile</a></li>
                 <li><a class="dropdown-item" href="/mybookings">My Bookings</a></li>
                 <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
               <% } %>
 
-             //Owner
+            
               <% if (currUser.role === "owner") { %>
                 <li><a class="dropdown-item" href="/profile">My Profile</a></li>
                 <li><a class="dropdown-item" href="/listings/new">Add New Listing</a></li>
