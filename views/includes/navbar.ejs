@@ -1,13 +1,13 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
   <div class="container-fluid">
 
-    <!-- Logo -->
+   
     <a class="navbar-brand d-flex align-items-center" href="/listings">
       <i class="fa-solid fa-compass fa-lg text-primary me-2"></i>
       <span class="fw-bold text-primary">Travel Mate</span>
     </a>
 
-    <!-- Mobile Toggle -->
+    
     <button
       class="navbar-toggler border-0"
       type="button"
@@ -20,7 +20,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Navbar Links -->
+    
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
@@ -43,7 +43,7 @@
               <li><a class="dropdown-item text-primary" href="/login">Login</a></li>
             <% } else { %>
 
-              <!-- ADMIN -->
+             //Admin
               <% if (currUser.role === "admin") { %>
                 <li><a class="dropdown-item" href="/profile">My Profile</a></li>
                 <li><a class="dropdown-item" href="/admin/dashboard">Admin Dashboard</a></li>
@@ -52,14 +52,14 @@
                 <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
               <% } %>
 
-              <!-- NORMAL USER -->
+             //User
               <% if (currUser.role === "user") { %>
                 <li><a class="dropdown-item" href="/profile">My Profile</a></li>
                 <li><a class="dropdown-item" href="/mybookings">My Bookings</a></li>
                 <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
               <% } %>
 
-              <!-- OWNER -->
+             //Owner
               <% if (currUser.role === "owner") { %>
                 <li><a class="dropdown-item" href="/profile">My Profile</a></li>
                 <li><a class="dropdown-item" href="/listings/new">Add New Listing</a></li>
