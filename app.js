@@ -1,11 +1,12 @@
 if (process.env.NODE_ENV != "production") {
   require("dotenv").config();
 }
-
+//const Availability = require("./models/availability.js");
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const Listing = require("./models/listing.js");
+const Booking = require("./models/booking.js");
 const Review = require("./models/review.js");
 const path = require("path");
 const methodoverride = require("method-override");
@@ -95,6 +96,47 @@ async function main() {
   await mongoose.connect(dbUrl);
 }
 
+
+function isAdmin(req, res, next) {
+  if (req.isAuthenticated() && req.user.role === "admin") {
+    return next();
+  }
+  req.flash("error", "Admin only");
+  res.redirect("/listings");
+}
+
+
+function isOwner(req, res, next) {
+  if (req.isAuthenticated() && req.user.role === "owner") {
+    return next();
+  }
+  req.flash("error", "Owner only");
+  res.redirect("/listings");
+}   
+
+function isUser(req, res, next) {
+  if (req.isAuthenticated() && req.user.role === "user") {
+    return next();
+  }
+  req.flash("error", "User only");
+  res.redirect("/listings");
+}  
+
+
+function isAdminOrOwner(req, res, next) {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "Login first");
+    return res.redirect("/login");
+  }
+
+  if (req.user.role === "admin" || req.user.role === "owner") {
+    return next();
+  }
+
+  req.flash("error", "Only Admin or Owner allowed");
+  res.redirect("/listings");
+}
+
 /*
 
 FOR ONE DATA INSERTION 
@@ -137,8 +179,8 @@ app.get("/signup", (req, res) => {
 
 app.post("/signup", async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
-    const newUser = new User({ username, email });
+    const { username, email, password,role } = req.body;
+    const newUser = new User({ username, email ,role});
 
 
     const existingUser = await User.findOne({ username });
@@ -225,7 +267,7 @@ app.get("/listings", async (req, res) => {
 
 //new Post Form
 
-app.get("/listings/new", (req, res) => {
+app.get("/listings/new", isOwner,(req, res) => {
   if (!req.isAuthenticated()) {
     req.flash("error", "Log In First");
     return res.redirect("/login");
@@ -256,7 +298,7 @@ app.post(
 
 //Edit route
 
-app.get("/listings/:id/edit", async (req, res) => {
+app.get("/listings/:id/edit", isAdminOrOwner, async (req, res) => {
   let { id } = req.params;
   const listings = await Listing.findById(id);
   if (!req.isAuthenticated()) {
@@ -267,15 +309,15 @@ app.get("/listings/:id/edit", async (req, res) => {
 });
 
 //Update route
-app.put("/listings/:id", upload.single("listing[image]"), async (req, res) => {
+app.put("/listings/:id",isAdminOrOwner, upload.single("listing[image]"), async (req, res) => {
   let { id } = req.params;
   if (!req.isAuthenticated()) {
     req.flash("error", "Logged In First");
     return res.redirect("/login");
   }
   let listing = await Listing.findById(id);
-  if (!listing.owner._id.equals(res.locals.currUser._id)) {
-    req.flash("success", "You don't have permission to edit");
+  if (req.user.role === "owner" && !listing.owner.equals(req.user._id)) {
+    req.flash("error", "You don't have permission to edit");
     return res.redirect(`/listings/${id}`);
   }
 
@@ -294,21 +336,25 @@ app.put("/listings/:id", upload.single("listing[image]"), async (req, res) => {
 
 //Delete
 
-app.delete("/listings/:id", async (req, res) => {
+app.delete("/listings/:id", isAdminOrOwner, async (req, res) => {
   let { id } = req.params;
-  if (!req.isAuthenticated()) {
-    req.flash("error", "Logged In First");
-    return res.redirect("/login");
-  }
 
   let listing = await Listing.findById(id);
-  if (!listing.owner._id.equals(res.locals.currUser._id)) {
-    req.flash("error", "You don't have permission to Delete");
+
+  if (req.user.role === "owner" && !listing.owner.equals(req.user._id)) {
+    req.flash("error", "No permission");
     return res.redirect(`/listings/${id}`);
   }
 
+  // 🔥 Delete all bookings of this listing
+  await Booking.deleteMany({ listing: id });
+
+  // 🔥 Delete availability dates
+  await Availability.deleteMany({ listing: id });
+
   await Listing.findByIdAndDelete(id);
-  req.flash("success", "Listing Deleted");
+
+  req.flash("success", "Listing and related bookings deleted");
   res.redirect("/listings");
 });
 
@@ -316,9 +362,11 @@ app.delete("/listings/:id", async (req, res) => {
 
 app.get("/listings/:id", async (req, res) => {
   let { id } = req.params;
+
   const listings = await Listing.findById(id)
-    .populate({ path: "reviews", populate: { path: "author" } })
-    .populate("owner");
+    .populate("owner")
+    .populate({ path: "reviews", populate: { path: "author" } });
+
   res.render("listings/show.ejs", { listings });
 });
 
@@ -384,3 +432,283 @@ app.get("/profile", (req, res) => {
 
   res.render("users/profile.ejs");
 });
+
+
+
+//Booking
+
+app.post("/listings/:id/book", isUser, async (req, res) => {
+  try {
+    if (!req.isAuthenticated()) {
+      req.flash("error", "Login first");
+      return res.redirect("/login");
+    }
+
+    let { id } = req.params;
+    let { checkIn, checkOut, adults, children } = req.body;
+
+    adults = parseInt(adults);
+    children = parseInt(children) || 0;
+
+    if (!adults || adults < 1) {
+      req.flash("error", "At least 1 adult required");
+      return res.redirect(`/listings/${id}`);
+    }
+
+    let listing = await Listing.findById(id);
+    if (!listing) {
+      req.flash("error", "Listing not found");
+      return res.redirect("/listings");
+    }
+
+    checkIn = new Date(checkIn);
+    checkOut = new Date(checkOut);
+
+    if (checkIn >= checkOut) {
+      req.flash("error", "Check-out must be after Check-in");
+      return res.redirect(`/listings/${id}`);
+    }
+
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (checkIn < today) {
+      req.flash("error", "Cannot book past dates");
+      return res.redirect(`/listings/${id}`);
+    }
+
+    // Calculate days
+    let days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+    if (days <= 0) days = 1;
+
+    // 💰 New Pricing Logic
+    let basePrice = listing.price;
+
+    let adultPricePerDay = adults * basePrice;
+    let childPricePerDay = children * (basePrice / 2);
+
+    let totalPerDay = adultPricePerDay + childPricePerDay;
+    let totalPrice = totalPerDay * days;
+
+    let booking = new Booking({
+      listing: id,
+      user: req.user._id,
+      owner: listing.owner,
+      checkIn,
+      checkOut,
+      totalDays: days,
+      totalPrice,
+      adults,
+      children,
+      paymentStatus: "Pending",
+      status: "active"
+    });
+
+    await booking.save();
+
+    req.flash("success", "✅ Booking successful!");
+    res.redirect("/mybookings");
+
+  } catch (err) {
+    console.log("BOOKING ERROR:", err);
+    req.flash("error", "Something went wrong");
+    res.redirect(`/listings/${req.params.id}`);
+  }
+});
+
+
+
+
+//My booking
+app.get("/mybookings", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "Login first");
+    return res.redirect("/login");
+  }
+
+  let bookings = await Booking.find({ user: req.user._id })
+    .populate("listing");
+
+  res.render("bookings/mybookings.ejs", { bookings });
+});
+
+
+
+
+app.get("/admin/bookings", isAdmin, async (req, res) => {
+  const bookings = await Booking.find()
+    .populate("user")
+    .populate("listing")
+    .populate("owner");
+
+  res.render("admin/bookings.ejs", { bookings });
+});
+
+
+app.get("/admin/dashboard", isAdmin, async (req, res) => {
+  const usersCount = await User.countDocuments();
+  const listingsCount = await Listing.countDocuments();
+  const bookingsCount = await Booking.countDocuments();
+
+  res.render("admin/dashboard.ejs", {
+    usersCount,
+    listingsCount,
+    bookingsCount,
+  });
+});
+
+
+
+
+
+// ADMIN - View All Users Profiles
+app.get("/admin/users", isAdmin, async (req, res) => {
+  const users = await User.find(); // get all users
+  res.render("admin/users.ejs", { users });
+});   
+
+
+// ADMIN - View Single User Profile
+app.get("/admin/users/:id", isAdmin, async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    req.flash("error", "User not found");
+    return res.redirect("/admin/users");
+  }
+
+  res.render("admin/userProfile.ejs", { user });
+});
+
+// ADMIN - Create Booking Form
+app.get("/admin/bookings/new", isAdmin, async (req, res) => {
+  const users = await User.find({ role: "user" });
+  const listings = await Listing.find();
+
+  res.render("admin/createBooking.ejs", { users, listings });
+});   
+
+
+// ADMIN - Create Booking for Any User
+app.post("/admin/bookings", isAdmin, async (req, res) => {
+  try {
+    let { userId, listingId, checkIn, checkOut, adults, children } = req.body;
+
+    adults = parseInt(adults);
+    children = parseInt(children) || 0;
+
+    let listing = await Listing.findById(listingId);
+
+    checkIn = new Date(checkIn);
+    checkOut = new Date(checkOut);
+
+    if (checkIn >= checkOut) {
+      req.flash("error", "Invalid dates");
+      return res.redirect("/admin/bookings/new");
+    }
+
+    // Calculate days
+    let days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+    if (days <= 0) days = 1;
+
+    // 💰 Adult Full + Child Half Price
+    let basePrice = listing.price;
+    let adultPricePerDay = adults * basePrice;
+    let childPricePerDay = children * (basePrice / 2);
+
+    let totalPerDay = adultPricePerDay + childPricePerDay;
+    let totalPrice = totalPerDay * days;
+
+    let booking = new Booking({
+      listing: listingId,
+      user: userId,
+      owner: listing.owner,
+      checkIn,
+      checkOut,
+      totalDays: days,
+      totalPrice,
+      adults,
+      children,
+      paymentStatus: "Paid", // Admin booking default Paid
+      status: "active",
+    });
+
+    await booking.save();
+
+    req.flash("success", "✅ Admin Booking Created Successfully");
+    res.redirect("/admin/bookings");
+
+  } catch (err) {
+    console.log("ADMIN BOOKING ERROR:", err);
+    req.flash("error", "Something went wrong");
+    res.redirect("/admin/bookings/new");
+  }
+});
+
+
+
+
+// OWNER - View bookings of own properties
+app.get("/owner/bookings", isOwner, async (req, res) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "Login first");
+    return res.redirect("/login");
+  }
+
+  const bookings = await Booking.find({ owner: req.user._id })
+    .populate("user")
+    .populate("listing");
+
+  res.render("owner/bookings.ejs", { bookings });
+});
+
+
+
+
+app.delete("/bookings/:id", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "Login first");
+    return res.redirect("/login");
+  }
+
+  let booking = await Booking.findById(req.params.id);
+  if (!booking) {
+    req.flash("error", "Booking not found");
+    return res.redirect("back");
+  }
+
+  // ✅ User can delete own booking
+  if (req.user.role === "user" && !booking.user.equals(req.user._id)) {
+    req.flash("error", "You don't have permission");
+    return res.redirect("/mybookings");
+  }
+
+  // ✅ Owner can delete booking of his property
+  if (req.user.role === "owner" && !booking.owner.equals(req.user._id)) {
+    req.flash("error", "You are not owner of this property");
+    return res.redirect("/owner/bookings");
+  }
+
+  // ✅ Admin can delete any booking
+  await Booking.findByIdAndDelete(req.params.id);
+
+  req.flash("success", "Booking Cancelled Successfully");
+
+  if (req.user.role === "admin") return res.redirect("/admin/bookings");
+  if (req.user.role === "owner") return res.redirect("/owner/bookings");
+  return res.redirect("/mybookings");
+});  
+
+
+
+// OWNER - My Properties Page
+app.get("/owner/properties", isOwner, async (req, res) => {
+  if (!req.isAuthenticated()) {
+    req.flash("error", "Login first");
+    return res.redirect("/login");
+  }
+
+  const properties = await Listing.find({ owner: req.user._id });
+
+  res.render("owner/properties.ejs", { properties });
+});
+
+

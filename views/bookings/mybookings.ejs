@@ -1,0 +1,63 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+
+  <h2 class="text-center mb-4 fw-bold">My Bookings</h2>
+
+  <div class="table-responsive shadow rounded">
+    <table class="table table-striped table-hover table-bordered align-middle">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>#</th>
+          <th>Hotel</th>
+          <th>Check In</th>
+          <th>Check Out</th>
+          <th>Days</th>
+          <th>Adults</th>
+          <th>Children</th>
+          <th>Total Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-center">
+        <% if(bookings.length === 0){ %>
+          <tr>
+            <td colspan="7" class="text-danger fw-bold">No bookings found</td>
+          </tr>
+        <% } %>
+
+        <% let i = 1; %>
+        <% for(let b of bookings){ %>
+          <tr>
+            <td><%= i++ %></td>
+
+            <td><%= b.listing ? b.listing.title : "Deleted Listing" %></td>
+
+            <td><%= new Date(b.checkIn).toDateString() %></td>
+            <td><%= new Date(b.checkOut).toDateString() %></td>
+
+            <td><%= b.totalDays %></td>
+            <td><%= b.adults %></td>
+            <td><%= b.children %></td>
+
+            <td class="fw-bold text-success">₹ <%= b.totalPrice %></td>
+
+            <!-- USER CANCEL BUTTON -->
+            <td>
+              <form action="/bookings/<%= b._id %>?_method=DELETE" method="POST">
+                <button class="btn btn-danger btn-sm">Cancel</button>
+              </form>
+            </td>
+
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/listings" class="btn btn-primary px-4">⬅ Back to Listings</a>
+  </div>
+
+</div>

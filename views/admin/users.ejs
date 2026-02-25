@@ -1,0 +1,47 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4 mt-md-5">
+  
+  <h2 class="fw-bold text-center mb-4">All Users</h2>
+
+  <div class="table-responsive shadow rounded">
+    <table class="table table-bordered table-striped table-hover align-middle mb-0">
+      
+      <thead class="table-dark text-center">
+        <tr>
+          <th>#</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>View Profile</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-center">
+        <% let i = 1; %>
+        <% for(let u of users){ %>
+          <tr>
+            <td><%= i++ %></td>
+            <td class="fw-semibold"><%= u.username %></td>
+            <td class="text-break"><%= u.email %></td>
+            <td class="fw-bold text-primary"><%= u.role %></td>
+            <td>
+              <a href="/admin/users/<%= u._id %>" 
+                 class="btn btn-info btn-sm w-100 w-md-auto">
+                 View
+              </a>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+
+    </table>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/admin/dashboard" class="btn btn-primary px-4">
+      ⬅ Back
+    </a>
+  </div>
+
+</div>

@@ -1,0 +1,37 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-4">
+
+  <h2 class="fw-bold text-center mb-4">👤 User Profile (Admin View)</h2>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-12">
+
+      <div class="card shadow p-4 rounded-4">
+        
+        <h4 class="mb-3">
+          Username: <span class="text-primary"><%= user.username %></span>
+        </h4>
+
+        <h5 class="mb-2">Email: <span class="fw-normal"><%= user.email %></span></h5>
+
+        <h5 class="mb-2">
+          Role: <span class="badge bg-success text-uppercase"><%= user.role %></span>
+        </h5>
+
+        <h6 class="text-muted mt-3">
+          User ID: <span class="fw-normal"><%= user._id %></span>
+        </h6>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mt-3 text-center">
+    <a href="/admin/users" class="btn btn-secondary w-100 w-md-auto">
+      ⬅ Back to Users
+    </a>
+  </div>
+
+</div>

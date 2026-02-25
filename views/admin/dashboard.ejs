@@ -1,0 +1,48 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-4">
+
+  <h2 class="mb-4 text-center fw-bold">Admin Dashboard</h2>
+
+  <div class="row g-3">
+
+    <!-- Users Card -->
+    <div class="col-lg-4 col-md-6 col-12">
+      <div class="card text-white bg-primary shadow h-100">
+        <div class="card-body text-center">
+          <h5 class="fw-bold">Total Users</h5>
+          <h2 class="fw-bold"><%= usersCount %></h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listings Card -->
+    <div class="col-lg-4 col-md-6 col-12">
+      <div class="card text-white bg-success shadow h-100">
+        <div class="card-body text-center">
+          <h5 class="fw-bold">Total Listings</h5>
+          <h2 class="fw-bold"><%= listingsCount %></h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings Card -->
+    <div class="col-lg-4 col-md-6 col-12">
+      <div class="card text-white bg-danger shadow h-100">
+        <div class="card-body text-center">
+          <h5 class="fw-bold">Total Bookings</h5>
+          <h2 class="fw-bold"><%= bookingsCount %></h2>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Button Section -->
+  <div class="mt-4 text-center">
+    <a href="/admin/bookings" class="btn btn-dark px-4 py-2 w-100 w-md-auto">
+      View All Bookings
+    </a>
+  </div>
+
+</div>

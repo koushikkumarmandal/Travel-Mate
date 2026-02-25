@@ -1,13 +1,26 @@
 <% if(success && success.length > 0){ %>
-<div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
+<div class="alert alert-success alert-dismissible fade show 
+            col-12 col-sm-10 col-md-8 col-lg-6 mx-auto mt-3" role="alert">
     <%= success[0] %>
-<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 <% } %>
 
 <% if(error && error.length > 0){ %>
-<div class="alert alert-danger alert-dismissible fade show col-6 offset-3" role="alert">
+<div class="alert alert-danger alert-dismissible fade show 
+            col-12 col-sm-10 col-md-8 col-lg-6 mx-auto mt-3" role="alert">
     <%= error[0] %>
-<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 <% } %>
+
+<script>
+  setTimeout(() => {
+    const alerts = document.querySelectorAll(".alert");
+    alerts.forEach(alert => {
+      alert.classList.remove("show");
+      alert.classList.add("fade");
+      setTimeout(() => alert.remove(), 500);
+    });
+  }, 2000);
+</script>

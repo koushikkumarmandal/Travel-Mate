@@ -1,0 +1,8 @@
+<h2>Block Dates for <%= listing.title %></h2>
+
+<form action="/owner/block-dates/<%= listing._id %>" method="POST">
+  <label>Select Dates</label>
+  <input type="date" name="dates" multiple class="form-control mb-2">
+
+  <button class="btn btn-danger">Block Dates</button>
+</form>

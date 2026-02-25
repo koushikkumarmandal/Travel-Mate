@@ -1,12 +1,13 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
   <div class="container-fluid">
 
-
+    <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center" href="/listings">
       <i class="fa-solid fa-compass fa-lg text-primary me-2"></i>
       <span class="fw-bold text-primary">Travel Mate</span>
     </a>
 
+    <!-- Mobile Toggle -->
     <button
       class="navbar-toggler border-0"
       type="button"
@@ -19,8 +20,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    
-   
+    <!-- Navbar Links -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 
@@ -30,22 +30,47 @@
             href="#"
             role="button"
             data-bs-toggle="dropdown"
-            aria-expanded="false"
           >
             Menu
           </a>
 
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/listings">Explore</a></li>
-            <li><a class="dropdown-item" href="/listings/new">Add New Listing</a></li>
+
+            
 
             <% if (!currUser) { %>
               <li><a class="dropdown-item text-success" href="/signup">Signup</a></li>
               <li><a class="dropdown-item text-primary" href="/login">Login</a></li>
             <% } else { %>
-              <li><a class="dropdown-item" href="/profile">My Profile</a></li>
-              <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+
+              <!-- ADMIN -->
+              <% if (currUser.role === "admin") { %>
+                <li><a class="dropdown-item" href="/profile">My Profile</a></li>
+                <li><a class="dropdown-item" href="/admin/dashboard">Admin Dashboard</a></li>
+                <li><a class="dropdown-item" href="/admin/users">Users</a></li>
+                <li><a class="dropdown-item" href="/admin/bookings/new">New Booking</a></li>
+                <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+              <% } %>
+
+              <!-- NORMAL USER -->
+              <% if (currUser.role === "user") { %>
+                <li><a class="dropdown-item" href="/profile">My Profile</a></li>
+                <li><a class="dropdown-item" href="/mybookings">My Bookings</a></li>
+                <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+              <% } %>
+
+              <!-- OWNER -->
+              <% if (currUser.role === "owner") { %>
+                <li><a class="dropdown-item" href="/profile">My Profile</a></li>
+                <li><a class="dropdown-item" href="/listings/new">Add New Listing</a></li>
+                <li><a class="dropdown-item" href="/owner/properties">My Properties</a></li>
+                <li><a class="dropdown-item" href="/owner/bookings">My Property Bookings</a></li>
+                <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                
+              <% } %>
+
             <% } %>
+
           </ul>
         </li>
 
@@ -54,9 +79,7 @@
   </div>
 </nav>
 
-
 <div class="pt-5"></div>
-
 
 <style>
   body {
@@ -75,9 +98,7 @@
     color: #0d6efd;
   }
 
-
   @media (max-width: 991px) {
-
     .nav-item.dropdown > a {
       display: none;
     }

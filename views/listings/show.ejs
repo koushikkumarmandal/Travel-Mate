@@ -19,15 +19,47 @@
                         <b><i>~ <%= listings.owner.username %></i></b><br>
                         <%= listings.description %> <br>
                         <span class="fw-bold text-success">₹ <%= listings.price %> / Night</span> <br>
+                        For Child :<span class="fw-bold text-success">₹ <%= listings.price /2 %> / Night</span> <br>
                         <%= listings.location %>, <%= listings.country %> <br>
                     </p>
                 </div>
             </div>
 
           
+            <% if(currUser && currUser.role === "user"){ %>
+<div class="card mb-4 p-3 shadow-sm">
+    <h4>Book This Hotel</h4>
+
+    <form action="/listings/<%= listings._id %>/book" method="POST">
+        <div class="mb-2">
+            <label>Check In</label>
+            <input type="date" id="checkIn" name="checkIn" class="form-control" required>
+        </div>
+
+        <div class="mb-2">
+            <label>Check Out</label>
+            <input type="date" id="checkOut" name="checkOut" class="form-control" required>
+        </div>
+
+        <!-- ✅ NEW: Adults -->
+        <div class="mb-2">
+            <label>Adults</label>
+            <input type="number" name="adults" class="form-control" min="1" value="1" required>
+        </div>
+
+        <!-- ✅ NEW: Children -->
+        <div class="mb-3">
+            <label>Children</label>
+            <input type="number" name="children" class="form-control" min="0" value="0">
+        </div>
+
+        <button class="btn btn-success w-100">Book Now</button>
+    </form>
+</div>
+<% } %>
 
 
-            <% if(currUser && listings.owner._id.equals(currUser._id)){ %>
+            <% if(currUser && (currUser.role === "admin" || listings.owner._id.equals(currUser._id))){ %>
                 <div class="d-flex flex-column flex-md-row justify-content-between mb-4 gap-2">
                     <a href="/listings/<%= listings._id %>/edit" class="btn btn-dark flex-fill">Edit</a>
                     <form action="/listings/<%= listings._id %>?_method=DELETE" method="post" class="flex-fill">
@@ -37,7 +69,7 @@
             <% } %>
 
           
-            <% if(currUser){ %>
+             <% if(currUser && currUser.role === "user"){ %>
             <div class="card mb-4 p-3 shadow-sm">
                 <h4>Leave a Review</h4>
                 <form action="/listings/<%= listings._id %>/reviews" method="POST" class="needs-validation" novalidate>
@@ -95,3 +127,8 @@
         </div>
     </div>
 </div>
+
+
+
+
+

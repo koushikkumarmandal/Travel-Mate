@@ -1,0 +1,58 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  /* Make all action buttons same size */
+  .action-btn {
+    width: 90px;
+  }
+</style>
+
+<div class="container mt-5">
+  <h2 class="text-center fw-bold mb-4">My Properties</h2>
+
+  <% if(properties.length === 0){ %>
+    <p class="text-center text-muted">No properties added yet.</p>
+  <% } %>
+
+  <div class="table-responsive shadow rounded">
+    <table class="table table-bordered table-striped align-middle text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Property Name</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% properties.forEach((p, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td class="fw-bold"><%= p.title %></td>
+
+          <td>
+            <div class="d-flex justify-content-center gap-2">
+
+              <a href="/listings/<%= p._id %>" class="btn btn-sm btn-primary action-btn">
+                Show
+              </a>
+
+              <a href="/listings/<%= p._id %>/edit" class="btn btn-sm btn-warning action-btn">
+                Edit
+              </a>
+
+              <form action="/listings/<%= p._id %>?_method=DELETE" method="POST">
+                <button class="btn btn-sm btn-danger action-btn">
+                  Delete
+                </button>
+              </form>
+
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+</div>

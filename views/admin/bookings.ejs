@@ -1,0 +1,71 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+
+  <h2 class="text-center mb-3 fw-bold">Admin Booking Dashboard</h2>
+
+  <div class="table-responsive shadow rounded">
+
+    <table class="table table-striped table-hover table-bordered align-middle small">
+      <thead class="table-dark text-center">
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Hotel</th>
+
+          <!-- Hide Owner on small screens -->
+          <th class="d-none d-md-table-cell">Owner</th>
+
+          <!-- Hide Dates on mobile -->
+          <th class="d-none d-lg-table-cell">Check In</th>
+          <th class="d-none d-lg-table-cell">Check Out</th>
+          <th>Days</th>
+          <th>Adults</th>
+          <th>Children</th>
+          <th>Total Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-center">
+        <% if(bookings.length === 0){ %>
+          <tr>
+            <td colspan="9" class="text-danger fw-bold">No bookings found</td>
+          </tr>
+        <% } %>
+
+        <% let i = 1; %>
+        <% for(let b of bookings){ %>
+        <tr>
+          <td><%= i++ %></td>
+
+          <td><%= b.user ? b.user.username : "Deleted User" %></td>
+          <td><%= b.listing ? b.listing.title : "Deleted Listing" %></td>
+
+          <td class="d-none d-md-table-cell"><%= b.owner ? b.owner.username : "Deleted Owner" %></td>
+
+          <td class="d-none d-lg-table-cell"><%= new Date(b.checkIn).toDateString() %></td>
+          <td class="d-none d-lg-table-cell"><%= new Date(b.checkOut).toDateString() %></td>
+
+          <td><%= b.totalDays %></td>
+          <td><%= b.adults || 0 %></td>
+          <td><%= b.children || 0 %></td>
+          <td class="fw-bold text-success">₹ <%= b.totalPrice %></td>
+
+          <td>
+            <form action="/bookings/<%= b._id %>?_method=DELETE" method="POST">
+              <button class="btn btn-danger btn-sm w-100 w-md-auto">Cancel</button>
+            </form>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="text-center mt-3">
+    <a href="/listings" class="btn btn-primary px-4 w-100 w-md-auto">⬅ Back to Listings</a>
+  </div>
+
+</div>
