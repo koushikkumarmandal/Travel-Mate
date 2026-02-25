@@ -24,7 +24,7 @@ const bookingSchema = new mongoose.Schema({
   totalDays: Number,
   totalPrice: Number,
 
-  // ✅ NEW FIELDS
+  
   adults: {
     type: Number,
     required: true,
